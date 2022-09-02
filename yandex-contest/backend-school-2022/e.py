@@ -1,71 +1,47 @@
-# d + (a + (b + c) = (a + b) + c + d -- 5
-# a + b = b + a -- -1
-# (a((b + c) = ab + bc -- -1
-
-
-# Почти правильная последовательность скобок - т.е. достаточно
-# убрать одну скобку и последовательность стане валидной.
-
-
-f = open('input.txt', 'r')
-s = f.read()
-f.close()
-
-
-def check():
-    all_open = 0
-    all_close = 0
-    close_index = -1
-    open_index = -1
-    open_number = 0
-    for i in range(len(s)):
-        if s[i] not in '()':
-            i -= 1
+def balance(skip: int) -> bool:
+    file = open('input.txt', 'r')
+    parenthesis_balance = 0
+    i = -1
+    while True:
+        c = file.read(1)
+        if not c:
+            break
+        i += 1
+        if i == skip:
             continue
-        if s[i] == ')':
-            all_close += 1
-            if not open_number:
-                if close_index == -1:
-                    close_index = i
-                else:
-                    return -1
-            else:
-                open_number -= 1
-                if not open_number:
-                    open_index = -1
-        else:
-            all_open += 1
-            open_number += 1
-            if open_index == -1:
-                open_index = i
-        if all_close - all_open > 1:
-            return -1
-    if all_open - all_close > 1:
-        return -1
-    if (close_index == -1 and open_index == -1) or (close_index != -1 and open_index != -1):
-        return -1
-    if close_index != -1:
-        index = close_index
-        current = index - 1
-        while current != -1:
-            if s[current] == '(':
-                break
-            elif s[current] == ')':
-                index = current
-            current -= 1
-        return index + 1
-    elif open_index != -1:
-        index = open_index
-        current = index - 1
-        while current != -1:
-            if s[current] == ')':
-                break
-            elif s[current] == '(':
-                index = current
-            current -= 1
-        return index + 1
-    else:
-        return -1
+        if c == '{':
+            parenthesis_balance += 1
+        elif c == '}':
+            if parenthesis_balance == 0:
+                return False
+            parenthesis_balance -= 1
+    return not bool(parenthesis_balance)
 
 
-print(check())
+def incorrect_parenthesis_index() -> int:
+    first_close = -1
+    last_open = -1
+    file = open('input.txt', 'r')
+    parenthesis_balance = 0
+    i = -1
+    while True:
+        c = file.read(1)
+        if not c:
+            break
+        i += 1
+        if c == '(':
+            if parenthesis_balance == 0:
+                last_open = i
+            parenthesis_balance += 1
+        elif c == ')':
+            if first_close == -1:
+                first_close = i
+            parenthesis_balance -= 1
+    if parenthesis_balance == 1 and balance(last_open):
+        return last_open + 1
+    if parenthesis_balance == -1 and balance(first_close):
+        return first_close + 1
+    return -1
+
+
+print(incorrect_parenthesis_index())
