@@ -1,5 +1,7 @@
 """
-Фермер Василий выбирает землю для покупки. Предмет торгов – прямоугольное поле шириной n и высотой m, которое состоит из участков, где 1 - плодородный участок, а 0 – неплодородный. Василий может либо купить регион поля любого размера, либо отказаться от покупки, если доступных для покупки регионов нет.
+Фермер Василий выбирает землю для покупки. Предмет торгов – прямоугольное поле шириной n и высотой m, которое состоит
+из участков, где 1 - плодородный участок, а 0 – неплодородный. Василий может либо купить регион поля любого размера,
+либо отказаться от покупки, если доступных для покупки регионов нет.
 
 
 Условия покупки следующие:
@@ -27,7 +29,9 @@
 – Покупатель платит только за общую площадь купленного региона
 
 
-Василий берет кредит на покупку, поэтому хочет потратить деньги как можно оптимальнее – купить тот регион, в котором будет максимальное соотношение плодородной земли к общей площади региона. Если есть несколько регионов с одинаковой «эффективностью», то Василий хочет купить бóльший из них по площади.
+Василий берет кредит на покупку, поэтому хочет потратить деньги как можно оптимальнее – купить тот регион, в котором
+будет максимальное соотношение плодородной земли к общей площади региона. Если есть несколько регионов с одинаковой
+«эффективностью», то Василий хочет купить бóльший из них по площади.
 
 Нужно определить площадь региона, который стоит купить фермеру
 
@@ -56,7 +60,7 @@ ratio, square = 0, 0
 
 def define(coord_y, coord_x):
     left = right = coord_x
-    up = bottom = coord_y
+    top = bottom = coord_y
     to_visit.clear()
     to_visit.append((coord_y, coord_x))
     while to_visit:
@@ -67,8 +71,8 @@ def define(coord_y, coord_x):
         y, x = coords
         if bottom < y:
             bottom = y
-        if up > y:
-            up = y
+        if top > y:
+            top = y
         if right < x:
             right = x
         if left > x:
@@ -78,24 +82,24 @@ def define(coord_y, coord_x):
             to_visit.append((y + 1, x))
         if x + 1 < max_x and matrix[y][x + 1]:  # go right
             to_visit.append((y, x + 1))
-        if y - 1 >= 0 and matrix[y - 1][x]:  # go up
+        if y - 1 >= 0 and matrix[y - 1][x]:  # go top
             to_visit.append((y - 1, x))
         if x - 1 >= 0 and matrix[y][x - 1]:  # go left
             to_visit.append((y, x - 1))
         if y + 1 < max_y and x + 1 < max_x and matrix[y + 1][x + 1]:  # go bottom & right
             to_visit.append((y + 1, x + 1))
-        if y - 1 >= 0 and x - 1 >= 0 and matrix[y - 1][x - 1]:  # go up & left
+        if y - 1 >= 0 and x - 1 >= 0 and matrix[y - 1][x - 1]:  # go top & left
             to_visit.append((y - 1, x - 1))
         if y + 1 < max_y and x - 1 >= 0 and matrix[y + 1][x - 1]:  # go bottom & left
             to_visit.append((y + 1, x - 1))
-        if y - 1 >= 0 and x + 1 < max_x and matrix[y - 1][x + 1]:  # go up & right
+        if y - 1 >= 0 and x + 1 < max_x and matrix[y - 1][x + 1]:  # go top & right
             to_visit.append((y - 1, x + 1))
-    return up, right, bottom, left
+    return top, right, bottom, left
 
 
-def count_rate(up, right, bottom, left):
+def count_rate(top, right, bottom, left):
     _rt, _sq = 0, 0
-    for y in range(up, bottom + 1):
+    for y in range(top, bottom + 1):
         for x in range(left, right + 1):
             if matrix[y][x]:
                 _rt += 1
