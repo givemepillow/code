@@ -27,41 +27,76 @@
 Выходные данные (ожидаются в стандартном потоке вывода)
 Одно целое число, максимальное количество резюме
 """
-
-from array import array
-
 n, m, s = tuple(map(int, input().split()))
-n_array, m_array = array('I'), array('I')
+n_array, m_array = [], []
+n_sum, n_count = 0, 0
+m_sum, m_count = 0, 0
 while n or m:
     n_num, m_num = input().split()
     if n:
-        n_array.append(int(n_num))
-        n -= 1
+        n_num = int(n_num)
+        if n_num + n_sum <= s:
+            n_array.append(n_num)
+            n_sum += n_num
+            n_count += 1
+            n -= 1
+        else:
+            n = 0
     if m:
-        m_array.append(int(m_num))
-        m -= 1
+        m_num = int(m_num)
+        if m_sum + m_num <= s:
+            m_array.append(m_num)
+            m_sum += m_num
+            m_count += 1
+            m -= 1
+        else:
+            m = 0
 
 
-def sum_counter(arr: array):
+def count_and_sum(array):
     current_sum = 0
-    count_and_sum = [(0, 0)]
-    for i, v in enumerate(arr, start=1):
-        current_sum += v
-        if current_sum > s:
-            return count_and_sum
-        count_and_sum.append((i, current_sum))
-    return count_and_sum
+    current_count = 0
+    for v in array:
+        if current_sum + v <= s:
+            current_sum += v
+            current_count += 1
+        else:
+            return current_count, current_sum, array[:current_count]
+    return current_count, current_sum, array[:current_count]
 
 
-def max_count(a_count, a_sum, b_list):
-    if s == a_sum:
-        return a_count
+def next_value(gen):
+    try:
+        value = next(gen)
+    except StopIteration:
+        return -1
+    return value
+
+
+def max_count(a_count, a_sum, a_list, b_list):
+    a_gen = reversed(a_list)
+    b_gen = iter(b_list)
     available_s = s - a_sum
-    for b_count, b_sum in reversed(b_list):
-        if b_sum <= available_s:
-            return a_count + b_count
-    return a_count
+    current_count = a_count
+    a_value = next_value(a_gen)
+    b_value = next_value(b_gen)
+    iters = 0
+    while True:
+        iters += 1
+        if b_value != -1 and available_s - b_value >= 0:
+            available_s -= b_value
+            current_count += 1
+            b_value = next_value(b_gen)
+        elif b_value != -1 and a_value != -1 and available_s - b_value + a_value >= 0:
+            available_s = available_s - b_value + a_value
+            a_value = next_value(a_gen)
+            b_value = next_value(b_gen)
+        else:
+            break
+    return current_count
 
 
-n_list, m_list = sum_counter(n_array), sum_counter(m_array)
-print(max(max_count(*n_list[-1], m_list), max_count(*m_list[-1], n_list)))
+m_count, m_sum, m_array = count_and_sum(m_array)
+n_count, n_sum, n_array = count_and_sum(n_array)
+
+print(max(max_count(n_count, n_sum, n_array, m_array), max_count(m_count, m_sum, m_array, n_array)))
