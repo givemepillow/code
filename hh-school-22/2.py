@@ -64,36 +64,34 @@ def define(coord_y, coord_x):
     to_visit.clear()
     to_visit.append((coord_y, coord_x))
     while to_visit:
-        coords = to_visit.pop()
-        if coords in visited:
+        if to_visit[-1] in visited:
             continue
-        visited.add(coords)
-        y, x = coords
-        if bottom < y:
-            bottom = y
-        if top > y:
-            top = y
-        if right < x:
-            right = x
-        if left > x:
-            left = x
 
-        if y + 1 < max_y and matrix[y + 1][x]:  # go bottom
-            to_visit.append((y + 1, x))
-        if x + 1 < max_x and matrix[y][x + 1]:  # go right
+        y, x = to_visit.pop()
+        visited.add((y, x))
+
+        bottom, top, right, left = max(y, bottom), min(y, bottom), max(x, right), min(x, left)
+        go_left, go_right, go_top, go_bottom = x - 1 >= 0, x + 1 < max_x, y - 1 >= 0, y + 1 < max_y
+
+        if go_right and matrix[y][x + 1]:  # go right
             to_visit.append((y, x + 1))
-        if y - 1 >= 0 and matrix[y - 1][x]:  # go top
-            to_visit.append((y - 1, x))
-        if x - 1 >= 0 and matrix[y][x - 1]:  # go left
+        if go_left and matrix[y][x - 1]:  # go left
             to_visit.append((y, x - 1))
-        if y + 1 < max_y and x + 1 < max_x and matrix[y + 1][x + 1]:  # go bottom & right
+
+        if go_bottom and matrix[y + 1][x]:  # go bottom
+            to_visit.append((y + 1, x))
+        if go_top and matrix[y - 1][x]:  # go top
+            to_visit.append((y - 1, x))
+
+        if go_bottom and go_right and matrix[y + 1][x + 1]:  # go bottom & right
             to_visit.append((y + 1, x + 1))
-        if y - 1 >= 0 and x - 1 >= 0 and matrix[y - 1][x - 1]:  # go top & left
-            to_visit.append((y - 1, x - 1))
-        if y + 1 < max_y and x - 1 >= 0 and matrix[y + 1][x - 1]:  # go bottom & left
+        if go_bottom and go_left and matrix[y + 1][x - 1]:  # go bottom & left
             to_visit.append((y + 1, x - 1))
-        if y - 1 >= 0 and x + 1 < max_x and matrix[y - 1][x + 1]:  # go top & right
+        if go_top and go_right and matrix[y - 1][x + 1]:  # go top & right
             to_visit.append((y - 1, x + 1))
+        if go_top and go_left and matrix[y - 1][x - 1]:  # go top & left
+            to_visit.append((y - 1, x - 1))
+
     return top, right, bottom, left
 
 
